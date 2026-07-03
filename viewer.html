@@ -2,73 +2,121 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    body { margin:0; background:transparent; font-family:Arial,sans-serif; }
-    #viewer {
-      width:100vw; height:100vh;
-      background-size:contain;
-      background-repeat:no-repeat;
-      background-position:center;
-      cursor:grab;
-      touch-action:none;
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      background: transparent;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
     }
+
+    #viewer-wrap {
+      width: 100%;
+      height: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      aspect-ratio: 1 / 1;
+    }
+
+    #viewer {
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: grab;
+      user-select: none;
+      touch-action: pan-y;
+    }
+
+    #viewer:active {
+      cursor: grabbing;
+    }
+
     #hint {
-      position:absolute; bottom:18px; left:0; right:0;
-      text-align:center; color:#777; font-size:14px;
-      pointer-events:none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 18px;
+      text-align: center;
+      color: #777;
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      #viewer-wrap {
+        height: 380px;
+        aspect-ratio: auto;
+      }
+
+      #hint {
+        bottom: 10px;
+        font-size: 13px;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<div id="viewer"></div>
-<div id="hint">Drag or swipe to rotate</div>
+  <div id="viewer-wrap">
+    <div id="viewer"></div>
+    <div id="hint">Drag or swipe to rotate</div>
+  </div>
 
-<script>
-const totalFrames = 72;
-const baseUrl = "https://norvena-ui.github.io/norvena-ui/assets/360/display-case-white/";
+  <script>
+    const totalFrames = 72;
+    const startFrame = 15;
+    const baseUrl = "https://norvena-ui.github.io/norvena-ui/assets/360/display-case-white/";
 
-let frame = 15;
-let dragging = false;
-let lastX = 0;
+    let frame = startFrame;
+    let dragging = false;
+    let lastX = 0;
 
-const viewer = document.getElementById("viewer");
+    const viewer = document.getElementById("viewer");
 
-function imgUrl(n) {
-  return baseUrl + String(n).padStart(4, "0") + "_result.webp";
-}
+    function imgUrl(n) {
+      return baseUrl + String(n).padStart(4, "0") + "_result.webp";
+    }
 
-function showFrame(n) {
-  frame = ((n - 1 + totalFrames) % totalFrames) + 1;
-  viewer.style.backgroundImage = `url("${imgUrl(frame)}")`;
-}
+    function showFrame(n) {
+      frame = ((n - 1 + totalFrames) % totalFrames) + 1;
+      viewer.style.backgroundImage = `url("${imgUrl(frame)}")`;
+    }
 
-for (let i = 1; i <= totalFrames; i++) {
-  const img = new Image();
-  img.src = imgUrl(i);
-}
+    for (let i = 1; i <= totalFrames; i++) {
+      const img = new Image();
+      img.src = imgUrl(i);
+    }
 
-showFrame(15);
+    showFrame(startFrame);
 
-viewer.addEventListener("pointerdown", e => {
-  dragging = true;
-  lastX = e.clientX;
-  viewer.setPointerCapture(e.pointerId);
-});
+    viewer.addEventListener("pointerdown", e => {
+      dragging = true;
+      lastX = e.clientX;
+      viewer.setPointerCapture(e.pointerId);
+    });
 
-viewer.addEventListener("pointerup", () => dragging = false);
-viewer.addEventListener("pointercancel", () => dragging = false);
+    viewer.addEventListener("pointerup", () => dragging = false);
+    viewer.addEventListener("pointercancel", () => dragging = false);
 
-viewer.addEventListener("pointermove", e => {
-  if (!dragging) return;
-  const dx = e.clientX - lastX;
+    viewer.addEventListener("pointermove", e => {
+      if (!dragging) return;
 
-  if (Math.abs(dx) > 8) {
-    showFrame(frame + (dx > 0 ? -1 : 1));
-    lastX = e.clientX;
-  }
-});
-</script>
+      const dx = e.clientX - lastX;
+
+      if (Math.abs(dx) > 8) {
+        showFrame(frame + (dx > 0 ? -1 : 1));
+        lastX = e.clientX;
+      }
+    });
+  </script>
 
 </body>
 </html>

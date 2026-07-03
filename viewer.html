@@ -28,7 +28,7 @@
 const totalFrames = 72;
 const baseUrl = "https://norvena-ui.github.io/norvena-ui/assets/360/display-case-white/";
 
-let frame = 1;
+let frame = 15;
 let dragging = false;
 let lastX = 0;
 
@@ -48,7 +48,7 @@ for (let i = 1; i <= totalFrames; i++) {
   img.src = imgUrl(i);
 }
 
-showFrame(1);
+showFrame(15);
 
 viewer.addEventListener("pointerdown", e => {
   dragging = true;
